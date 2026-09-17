@@ -1,6 +1,4 @@
-# Default ignored files
+# Ignored files and folders
 .DS_Store
-
-# and folders
 .idea/
 allure-results/
