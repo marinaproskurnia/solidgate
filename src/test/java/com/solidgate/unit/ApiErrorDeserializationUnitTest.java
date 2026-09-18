@@ -1,11 +1,15 @@
-package com.solidgate.model.response;
+package com.solidgate.unit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solidgate.model.response.ApiError;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ApiErrorDeserializationTest {
+/**
+ * Unit tests for {@link ApiError} Jackson custom deserialization.
+ */
+class ApiErrorDeserializationUnitTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

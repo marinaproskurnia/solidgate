@@ -1,5 +1,6 @@
-package com.solidgate.checkout_solutions.payment_page;
+package com.solidgate.api.checkout_solutions.payment_page;
 
+import com.solidgate.config.ApiParameters;
 import com.solidgate.model.request.InitPageRequest;
 import com.solidgate.model.request.Order;
 import com.solidgate.model.request.PageCustomization;
@@ -8,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static com.solidgate.checkout_solutions.payment_page.TestData.ORDER_DESCRIPTION;
-import static com.solidgate.checkout_solutions.payment_page.TestData.PAYMENT_CURRENCY;
+import static com.solidgate.api.checkout_solutions.payment_page.TestData.ORDER_DESCRIPTION;
+import static com.solidgate.api.checkout_solutions.payment_page.TestData.PAYMENT_CURRENCY;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,9 +34,9 @@ class CreatePaymentPagePaymentTest extends BaseApiTest {
         var requestBody = step("Build payment page request body",
                 () -> toJson(paymentRequest(generateUniqueOrderId())));
         var response = step("Create payment page with invalid signature",
-                () -> client.createPaymentPage(requestBody, config.getMerchantPublicKey(), "invalid-signature"));
+                () -> client.createPaymentPage(requestBody, ApiParameters.getMerchantPublicKey(), "invalid-signature"));
         step("Verify authentication error response", () -> {
-            assertThat(response.hasError()).isTrue();
+            assertThat(response.hasError()).isTrue();//here - replace with equals
             assertThat(response.getError().getCode()).isEqualTo("1.01");
             assertThat(response.getError().getMessageAsText()).containsIgnoringCase("authentication failed");
         });
@@ -45,10 +46,9 @@ class CreatePaymentPagePaymentTest extends BaseApiTest {
     @Tag("TC5")
     void shouldFailWhenInvalidAmountValue() {
         var requestBody = step("Build payment page request body without amount", () -> {
-            var invalidAmount = -1;
             var order = new Order();
             order.setOrderId(generateUniqueOrderId());
-            order.setAmount(invalidAmount);
+            order.setAmount(-1);
             order.setCurrency(PAYMENT_CURRENCY);
             order.setOrderDescription(ORDER_DESCRIPTION);
 
@@ -114,11 +114,7 @@ class CreatePaymentPagePaymentTest extends BaseApiTest {
     void shouldFailWhenInvoiceIdDoesNotExist() {
         var orderId = step("Generate unique order ID", this::generateUniqueOrderId);
         var requestBody = step("Build invoice payment page request body with non-existing invoice ID",
-                () -> {
-                    var nonExistingInvoiceId = "inv_nonexisting_value";
-                    return toJson(invoiceRequest(orderId, nonExistingInvoiceId));
-                }
-        );
+                () -> toJson(invoiceRequest(orderId, "inv_nonexisting_value")));
         var response = step("Create payment page", () -> client.createPaymentPage(requestBody));
         step("Verify error response", () -> {
             assertThat(response.hasError()).isTrue();
@@ -132,12 +128,8 @@ class CreatePaymentPagePaymentTest extends BaseApiTest {
     @Tag("TC9")
     void shouldFailWhenSubscriptionIdDoesNotExist() {
         var orderId = step("Generate unique order ID", this::generateUniqueOrderId);
-        var requestBody = step("Build invoice payment page request body with non-existing invoice ID",
-                () -> {
-                    var nonExistingSubscriptionId = UUID.randomUUID().toString();
-                    return toJson(subscriptionRequest(orderId, nonExistingSubscriptionId));
-                }
-        );
+        var requestBody = step("Build subscription payment page request body with non-existing product ID",
+                () -> toJson(subscriptionRequest(orderId, UUID.randomUUID().toString())));
         var response = step("Create payment page", () -> client.createPaymentPage(requestBody));
         step("Verify error response", () -> {
             assertThat(response.hasError()).isTrue();
