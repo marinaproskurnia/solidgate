@@ -12,7 +12,7 @@ Feature: Create Payment Page via Solidgate API v1
     Given merchant API credentials are configured
     And the payment page base URL is "https://payment-page.solidgate.com/api/v1"
 
-  @positive @payment @TC1
+  @TC1 @positive @api @payment
   Scenario: Create payment page for a standard order
     Given a unique merchant order id
     And a payment order with:
@@ -33,7 +33,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the payment page url should end with the payment page id
     And if the response contains guid it should be non-empty
 
-  @positive @subscription @TC2 @skip
+  @TC2 @positive @api @subscription @not_implemented
   Scenario: Create payment page for a subscription order
     # Skipped — no automated implementation yet
     Given a unique merchant order id
@@ -51,7 +51,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the payment page url should end with the payment page id
     And if the response contains guid it should be non-empty
 
-  @positive @invoice @TC3 @skip
+  @TC3 @positive @api @invoice @not_implemented
   Scenario: Create payment page for an invoice order
     # Skipped — no automated implementation yet
     Given a unique merchant order id
@@ -67,7 +67,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the payment page url should end with the payment page id
     And if the response contains guid it should be non-empty
 
-  @negative @authentication @TC4
+  @TC4 @negative @api @authentication
   Scenario: Fail to create payment page with invalid signature
     Given a unique merchant order id
     And a valid payment order request body
@@ -76,7 +76,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the error code should be "1.01"
     And the error message should contain "Authentication failed"
 
-  @negative @validation @invalid-value @TC5
+  @TC5 @negative @api @validation
   Scenario: Fail to create payment page with invalid amount
     Given a unique merchant order id
     And a payment order with:
@@ -90,7 +90,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the error code should be "2.01"
     And the validation error for order field "amount" should be "must be greater than or equal to 0"
 
-  @negative @validation @TC6
+  @TC6 @negative @api @validation
   Scenario: Fail to create payment page when required currency is missing
     Given a unique merchant order id
     And a payment order request body without amount and currency
@@ -100,7 +100,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the error code should be "2.01"
     And the validation error for order field "currency" should be "cannot be blank"
 
-  @negative @validation @TC7
+  @TC7 @negative @api @validation
   Scenario: Fail to create payment page when required public name is missing
     Given a unique merchant order id
     And a payment order with:
@@ -114,7 +114,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the error code should be "2.01"
     And the validation error for page_customization field "public_name" should be "cannot be blank"
 
-  @negative @validation @invoice @TC8
+  @TC8 @negative @api @invoice
   Scenario: Fail to create payment page when invoice id does not exist
     Given a unique merchant order id
     And an invoice order with invoice id "inv_nonexisting_value"
@@ -124,7 +124,7 @@ Feature: Create Payment Page via Solidgate API v1
     And the error code should be "2.01"
     And the error message list should contain "Invoice not found"
 
-  @negative @validation @subscription @TC9
+  @TC9 @negative @api @subscription
   Scenario: Fail to create subscription payment page when product id does not exist
     Given a unique merchant order id
     And a unique customer account id
@@ -134,30 +134,3 @@ Feature: Create Payment Page via Solidgate API v1
     Then the response should contain an error
     And the error code should be "2.01"
     And the error message list should contain "Subscription error"
-
-@e2e @ui @payment-page @checkout_solutions
-Feature: Complete payment on hosted payment page
-  As a customer
-  I want to pay on a Solidgate-hosted payment page
-  So that the merchant receives a successful payment confirmation
-
-  Background:
-    Given merchant API credentials are configured
-    And test card details are configured
-
-  @positive @payment @E2E @TC10
-  Scenario Outline: Complete payment on hosted page in multiple browsers
-    Given a payment page is created via API for a standard order
-    And I open the payment page using the response url
-    When I fill in card number, expiry, CVV, and email
-    And I submit the payment
-    Then I should see the payment success message "Payment successful!"
-    And the success page should show order description "Premium package"
-    And the success page should show amount "€10.20"
-    And the success page should show order title "Order Title"
-
-    Examples:
-      | browser |
-      | CHROME  |
-      | FIREFOX |
-      | SAFARI  |

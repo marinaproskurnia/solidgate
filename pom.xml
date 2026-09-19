@@ -18,6 +18,8 @@
         <guava.version>33.4.0-jre</guava.version>
         <assertj.version>3.27.3</assertj.version>
         <allure.version>2.29.1</allure.version>
+        <allure.commandline.version>2.46.1</allure.commandline.version>
+        <allure.maven.plugin.version>2.15.2</allure.maven.plugin.version>
         <selenium.version>4.27.0</selenium.version>
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
     </properties>
@@ -82,6 +84,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure.maven.plugin.version}</version>
+                <configuration>
+                    <reportVersion>${allure.commandline.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>
