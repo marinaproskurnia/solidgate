@@ -7,8 +7,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.safari.SafariDriver;
-import org.openqa.selenium.safari.SafariOptions;
 
 public final class WebDriverFactory {
 
@@ -18,7 +16,6 @@ public final class WebDriverFactory {
         return switch (browserType) {
             case CHROME -> createChromeDriver();
             case FIREFOX -> createFirefoxDriver();
-            case SAFARI -> createSafariDriver();
         };
     }
 
@@ -38,9 +35,5 @@ public final class WebDriverFactory {
             options.addArguments("-headless");
         }
         return new FirefoxDriver(options);
-    }
-
-    private static WebDriver createSafariDriver() {
-        return new SafariDriver(new SafariOptions());
     }
 }

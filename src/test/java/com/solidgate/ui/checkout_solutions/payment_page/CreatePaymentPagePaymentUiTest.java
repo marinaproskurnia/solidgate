@@ -2,15 +2,16 @@ package com.solidgate.ui.checkout_solutions.payment_page;
 
 import com.solidgate.api.checkout_solutions.payment_page.PaymentPageApiSteps;
 import com.solidgate.api.checkout_solutions.payment_page.TestData;
+import com.solidgate.model.response.InitPageResponse;
 import com.solidgate.model.web.BrowserType;
 import com.solidgate.ui.checkout_solutions.payment_page.helpers.CardExpiryGenerator;
 import com.solidgate.ui.checkout_solutions.payment_page.pages.PaymentCheckoutPage;
 import com.solidgate.ui.checkout_solutions.payment_page.pages.PaymentSuccessPage;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static com.solidgate.model.web.BrowserType.SAFARI;
 import static io.qameta.allure.Allure.step;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,13 +20,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class CreatePaymentPagePaymentUiTest extends BaseUiTest {
 
     @ParameterizedTest
+    @Tags({@Tag("@TC-UI-1"), @Tag("@e2e")})
     @EnumSource(BrowserType.class)
-    @Tag("TC10")
-    @Tag("E2E")
     void shouldCompletePaymentOnHostedPage(BrowserType browserType) {
-        step("Check operating system. Safari tests run only on macOS ", () -> {
-            checkOperatingSystem(browserType);
-        });
         step(format("Start Web browser %s", browserType), () -> {
             try {
                 startBrowser(browserType);
@@ -34,7 +31,7 @@ class CreatePaymentPagePaymentUiTest extends BaseUiTest {
             }
         });
         var apiSteps = new PaymentPageApiSteps();
-        var createdPageResponse = step("Create Payment page", () -> {
+        var createdPage = step("Create Payment page", () -> {
             var orderId = step("Generate unique order ID", apiSteps::generateUniqueOrderId);
             var response = step("Create payment page via API",
                     () -> apiSteps.createPaymentPage(orderId));
@@ -42,10 +39,10 @@ class CreatePaymentPagePaymentUiTest extends BaseUiTest {
                 assertThat(response.hasError()).isFalse();
                 assertThat(response.getUrl()).isNotBlank();
             });
-            return response;
+            return new CreatedPaymentPage(orderId, response);
         });
         var paymentPageUrl = step("Resolve payment page URL from API response",
-                () -> apiSteps.resolvePaymentPageUrl(createdPageResponse));
+                () -> apiSteps.resolvePaymentPageUrl(createdPage.response()));
         step("Complete payment on hosted page", () -> {
             new PaymentCheckoutPage(driver)
                     .open(paymentPageUrl)
@@ -55,9 +52,8 @@ class CreatePaymentPagePaymentUiTest extends BaseUiTest {
                     .enterEmail(TestData.TEST_CARD_EMAIL)
                     .submitPayment();
         });
-
         step("Verify payment success page", () -> {
-            PaymentSuccessPage successPage = new PaymentSuccessPage(driver)
+            var successPage = new PaymentSuccessPage(driver)
                     .waitForSuccess(TestData.PAYMENT_SUCCESS_MESSAGE);
 
             assertThat(successPage.getStatusTitle()).isEqualTo(TestData.PAYMENT_SUCCESS_MESSAGE);
@@ -65,12 +61,16 @@ class CreatePaymentPagePaymentUiTest extends BaseUiTest {
             assertThat(successPage.getPriceMajor()).containsIgnoringCase("10.20");
             assertThat(successPage.getOrderTitle()).contains(TestData.ORDER_TITLE);
         });
+        step("Verify order status via POST /status", () -> {
+            var status = apiSteps.getOrderStatus(createdPage.orderId());
+            assertThat(status.getOrder()).isNotNull();
+            assertThat(status.getOrder().getOrderId()).isEqualTo(createdPage.orderId());
+            assertThat(status.getOrder().getAmount()).isEqualTo(TestData.PAYMENT_AMOUNT);
+            assertThat(status.getOrder().getCurrency()).isEqualTo(TestData.PAYMENT_CURRENCY);
+            assertThat(status.getOrder().getStatus()).isEqualTo(TestData.EXPECTED_ORDER_STATUS);
+        });
     }
 
-    private static void checkOperatingSystem(BrowserType browserType) {
-        if (browserType == SAFARI) {
-            assumeTrue(System.getProperty("os.name").toLowerCase().contains("mac"),
-                    "Safari tests run only on macOS");
-        }
+    private record CreatedPaymentPage(String orderId, InitPageResponse response) {
     }
 }
