@@ -14,7 +14,7 @@ import static com.solidgate.api.checkout_solutions.payment_page.TestData.PAYMENT
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CreatePaymentPagePaymentTest extends BaseApiTest {
+class CreatePaymentPagePaymentApiTest extends BaseApiTest {
 
     @Test
     @Tag("TC1")
@@ -36,7 +36,7 @@ class CreatePaymentPagePaymentTest extends BaseApiTest {
         var response = step("Create payment page with invalid signature",
                 () -> client.createPaymentPage(requestBody, ApiParameters.getMerchantPublicKey(), "invalid-signature"));
         step("Verify authentication error response", () -> {
-            assertThat(response.hasError()).isTrue();//here - replace with equals
+            assertThat(response.hasError()).isTrue();
             assertThat(response.getError().getCode()).isEqualTo("1.01");
             assertThat(response.getError().getMessageAsText()).containsIgnoringCase("authentication failed");
         });

@@ -8,6 +8,7 @@ public final class TestData {
     public static final String ORDER_TITLE = "Order Title";
     public static final String PAYMENT_CURRENCY = "EUR";
     public static final int PAYMENT_AMOUNT = 1020;
+    public static final String EXPECTED_ORDER_STATUS = "auth_ok";
 
     public static final String TEST_CARD_NUMBER = "4067429974719265";
     public static final String TEST_CARD_CVV = "222";

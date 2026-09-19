@@ -24,11 +24,15 @@ public final class ApiParameters {
         return PROPERTIES.getProperty("payment.page.link.base.url");
     }
 
+    public static String getCardPaymentsBaseUrl() {
+        return PROPERTIES.getProperty("card.payments.base.url");
+    }
+
     public static boolean hasCredentials() {
         return isConfigured(getMerchantPublicKey()) && isConfigured(getSignatureSecretKey());
     }
 
     private static boolean isConfigured(String value) {
-        return value != null && !value.isBlank() && !"SET_ME".equals(value);//here
+        return value != null && !value.isBlank() && !"SET_ME".equals(value);
     }
 }
