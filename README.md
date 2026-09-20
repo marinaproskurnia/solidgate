@@ -22,7 +22,7 @@ mvn clean test
 2. API tests only:
 
 ```bash
-mvn clean test
+mvn clean test -Dtest=CreatePaymentPagePaymentApiTest
 ```
 
 3. UI test only (in Chrome and Firefox):
