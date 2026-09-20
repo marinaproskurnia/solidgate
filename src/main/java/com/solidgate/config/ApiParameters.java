@@ -45,9 +45,6 @@ public final class ApiParameters {
         return isConfigured(getMerchantPublicKey()) && isConfigured(getSignatureSecretKey());
     }
 
-    /**
-     * Fails fast when API credentials are missing so the suite does not silently skip.
-     */
     public static void requireCredentials() {
         boolean publicKeyConfigured = isConfigured(getMerchantPublicKey());
         boolean secretKeyConfigured = isConfigured(getSignatureSecretKey());
