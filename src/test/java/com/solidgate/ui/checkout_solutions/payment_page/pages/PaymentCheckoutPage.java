@@ -9,6 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static com.solidgate.config.ApiParameters.getWebDriverWaitTimeoutSec;
+
 public class PaymentCheckoutPage {
 
     private static final By CARD_NUMBER = By.cssSelector("[data-testid='cardNumber']");
@@ -22,7 +24,7 @@ public class PaymentCheckoutPage {
 
     public PaymentCheckoutPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(getWebDriverWaitTimeoutSec()));
     }
 
     public PaymentCheckoutPage open(String paymentPageUrl) {

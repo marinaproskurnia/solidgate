@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link ApiError} Jackson custom deserialization.
+ * Unit tests for {@link ApiError} Jackson custom deserialization
  */
-class ApiErrorDeserializationUnitTest {
+class ApiErrorDeserializationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

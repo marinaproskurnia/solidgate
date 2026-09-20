@@ -2,7 +2,7 @@ package com.solidgate.ui.checkout_solutions.payment_page.helpers;
 
 import java.time.Year;
 
-import static com.solidgate.api.checkout_solutions.payment_page.TestData.TEST_CARD_EXPIRY_MONTH;
+import static com.solidgate.api.checkout_solutions.payment_page.data.TestData.TEST_CARD_EXPIRY_MONTH;
 import static java.lang.String.format;
 
 public final class CardExpiryGenerator {

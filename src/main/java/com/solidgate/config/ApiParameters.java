@@ -1,6 +1,7 @@
 package com.solidgate.config;
 
-import static com.solidgate.config.PropertyReader.PROPERTIES;
+import static com.solidgate.config.PropertyReader.GLOBAL_PROPERTIES;
+import static java.lang.Long.parseLong;
 
 public final class ApiParameters {
 
@@ -9,23 +10,35 @@ public final class ApiParameters {
     }
 
     public static String getMerchantPublicKey() {
-        return PROPERTIES.getProperty("merchant.public.key");
+        return GLOBAL_PROPERTIES.get("merchant.public.key");
     }
 
     public static String getSignatureSecretKey() {
-        return PROPERTIES.getProperty("signature.secret.key");
+        return GLOBAL_PROPERTIES.get("signature.secret.key");
     }
 
     public static String getPaymentPageBaseUrl() {
-        return PROPERTIES.getProperty("payment.page.base.url");
+        return GLOBAL_PROPERTIES.get("payment.page.base.url");
     }
 
     public static String getPaymentPageLinkBaseUrl() {
-        return PROPERTIES.getProperty("payment.page.link.base.url");
+        return GLOBAL_PROPERTIES.get("payment.page.link.base.url");
     }
 
     public static String getCardPaymentsBaseUrl() {
-        return PROPERTIES.getProperty("card.payments.base.url");
+        return GLOBAL_PROPERTIES.get("card.payments.base.url");
+    }
+
+    public static long getWebDriverWaitTimeoutSec() {
+        return parseLong(GLOBAL_PROPERTIES.get("web.driver.wait.timeout.sec"));
+    }
+
+    public static long getOrderStatusTimeoutSec() {
+        return parseLong(GLOBAL_PROPERTIES.get("order.status.timeout.sec"));
+    }
+
+    public static long getOrderStatusPollIntervalMs() {
+        return parseLong(GLOBAL_PROPERTIES.get("order.status.poll.interval.ms"));
     }
 
     public static boolean hasCredentials() {

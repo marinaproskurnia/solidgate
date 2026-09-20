@@ -1,4 +1,4 @@
-package com.solidgate.api.checkout_solutions.payment_page;
+package com.solidgate.api.checkout_solutions.payment_page.data;
 
 public final class TestData {
 

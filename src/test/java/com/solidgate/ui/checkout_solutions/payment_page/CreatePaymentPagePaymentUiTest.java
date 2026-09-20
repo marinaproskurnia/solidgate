@@ -1,7 +1,7 @@
 package com.solidgate.ui.checkout_solutions.payment_page;
 
-import com.solidgate.api.checkout_solutions.payment_page.PaymentPageApiSteps;
-import com.solidgate.api.checkout_solutions.payment_page.TestData;
+import com.solidgate.api.checkout_solutions.payment_page.steps.PaymentPageApiSteps;
+import com.solidgate.api.checkout_solutions.payment_page.data.TestData;
 import com.solidgate.model.response.InitPageResponse;
 import com.solidgate.model.web.BrowserType;
 import com.solidgate.ui.checkout_solutions.payment_page.helpers.CardExpiryGenerator;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import static com.solidgate.api.checkout_solutions.payment_page.data.TestData.EXPECTED_PAYMENT_AMOUNT_DISPLAY;
 import static io.qameta.allure.Allure.step;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +59,7 @@ class CreatePaymentPagePaymentUiTest extends BaseUiTest {
 
             assertThat(successPage.getStatusTitle()).isEqualTo(TestData.PAYMENT_SUCCESS_MESSAGE);
             assertThat(successPage.getOrderDescription()).contains(TestData.ORDER_DESCRIPTION);
-            assertThat(successPage.getPriceMajor()).containsIgnoringCase("10.20");
+            assertThat(successPage.getPriceMajor()).containsIgnoringCase(EXPECTED_PAYMENT_AMOUNT_DISPLAY);
             assertThat(successPage.getOrderTitle()).contains(TestData.ORDER_TITLE);
         });
         step("Verify order status via POST /status", () -> {

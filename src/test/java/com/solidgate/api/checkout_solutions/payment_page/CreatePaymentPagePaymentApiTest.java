@@ -1,5 +1,6 @@
 package com.solidgate.api.checkout_solutions.payment_page;
 
+import com.solidgate.api.checkout_solutions.payment_page.data.TestData;
 import com.solidgate.config.ApiParameters;
 import com.solidgate.model.request.InitPageRequest;
 import com.solidgate.model.request.Order;
@@ -9,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static com.solidgate.api.checkout_solutions.payment_page.TestData.ORDER_DESCRIPTION;
-import static com.solidgate.api.checkout_solutions.payment_page.TestData.PAYMENT_CURRENCY;
+import static com.solidgate.api.checkout_solutions.payment_page.data.TestData.ORDER_DESCRIPTION;
+import static com.solidgate.api.checkout_solutions.payment_page.data.TestData.PAYMENT_CURRENCY;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
