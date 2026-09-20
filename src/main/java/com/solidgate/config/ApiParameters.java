@@ -45,6 +45,32 @@ public final class ApiParameters {
         return isConfigured(getMerchantPublicKey()) && isConfigured(getSignatureSecretKey());
     }
 
+    /**
+     * Fails fast when API credentials are missing so the suite does not silently skip.
+     */
+    public static void requireCredentials() {
+        boolean publicKeyConfigured = isConfigured(getMerchantPublicKey());
+        boolean secretKeyConfigured = isConfigured(getSignatureSecretKey());
+        if (publicKeyConfigured && secretKeyConfigured) {
+            return;
+        }
+        StringBuilder missing = new StringBuilder();
+        if (!publicKeyConfigured) {
+            missing.append("merchant.public.key");
+        }
+        if (!secretKeyConfigured) {
+            if (!missing.isEmpty()) {
+                missing.append(" and ");
+            }
+            missing.append("signature.secret.key");
+        }
+        throw new IllegalStateException(
+                "Missing required API credentials: " + missing
+                        + ". Set them in src/test/resources/testing.properties "
+                        + "or pass via -Dmerchant.public.key=... -Dsignature.secret.key=..."
+        );
+    }
+
     private static boolean isConfigured(String value) {
         return value != null && !value.isBlank() && !"SET_ME".equals(value);
     }

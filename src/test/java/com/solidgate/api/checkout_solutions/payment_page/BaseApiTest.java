@@ -9,7 +9,6 @@ import com.solidgate.util.JsonBodySerializer;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -33,10 +32,7 @@ abstract class BaseApiTest {
 
     @BeforeEach
     void requireCredentials() {
-        Assumptions.assumeTrue(
-                ApiParameters.hasCredentials(),
-                "Configure merchant.public.key and signature.secret.key in testing.properties"
-        );
+        ApiParameters.requireCredentials();
     }
 
     protected String generateUniqueOrderId() {
