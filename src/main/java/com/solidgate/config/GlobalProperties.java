@@ -3,6 +3,7 @@ package com.solidgate.config;
 import static java.util.Optional.ofNullable;
 
 import java.util.List;
+
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.EnvironmentConfiguration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
@@ -20,6 +21,8 @@ public class GlobalProperties {
     public static CompositeConfiguration compositeConfiguration;
 
     private GlobalProperties() {
+        String propertiesFile = ofNullable(System.getProperty("property.file")).orElse(
+                "testing.properties");
         try {
             compositeConfiguration = new CompositeConfiguration();
             compositeConfiguration.addConfiguration(new SystemConfiguration());
@@ -27,10 +30,12 @@ public class GlobalProperties {
             compositeConfiguration.addConfiguration(
                     new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
                             .configure(new Parameters().properties().setFileName(
-                                    ofNullable(System.getProperty("property.file")).orElse(
-                                            "testing.properties"))).getConfiguration());
-        } catch (ConfigurationException ignored) {
-            // ignored if it cannot load the testing.properties file
+                                    propertiesFile)).getConfiguration());
+        } catch (ConfigurationException exception) {
+            throw new IllegalStateException(String.format("Failed to load configuration from '%s'" +
+                            ". Ensure the file is on the classpath or set it as env var " +
+                            "-Dproperty.file=<path>.",
+                    propertiesFile), exception);
         }
     }
 
