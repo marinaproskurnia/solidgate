@@ -1,5 +1,6 @@
-package com.solidgate.api.checkout_solutions.payment_page;
+package com.solidgate.api.checkout_solutions.payment_page.steps;
 
+import com.solidgate.api.checkout_solutions.payment_page.data.TestData;
 import com.solidgate.client.OrderStatusClient;
 import com.solidgate.client.PaymentPageClient;
 import com.solidgate.config.ApiParameters;
@@ -7,12 +8,15 @@ import com.solidgate.model.response.InitPageResponse;
 import com.solidgate.model.response.OrderStatusResponse;
 import com.solidgate.util.JsonBodySerializer;
 
+import org.awaitility.core.ConditionTimeoutException;
+
+import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.awaitility.Awaitility.await;
 
 public final class PaymentPageApiSteps {
-
-    private static final long STATUS_TIMEOUT_MS = 30_000;
-    private static final long STATUS_POLL_INTERVAL_MS = 1_000;
 
     private final PaymentPageClient client = new PaymentPageClient();
     private final OrderStatusClient orderStatusClient = new OrderStatusClient();
@@ -30,10 +34,6 @@ public final class PaymentPageApiSteps {
         return ApiParameters.getPaymentPageLinkBaseUrl() + "/" + guid;
     }
 
-    /**
-     * Resolves the hosted payment page URL from the API response.
-     * The API {@code url} field uses {@code id} in the path; {@code guid} is a separate session identifier.
-     */
     public String resolvePaymentPageUrl(InitPageResponse response) {
         if (response.getUrl() != null && !response.getUrl().isBlank()) {
             return response.getUrl();
@@ -44,20 +44,24 @@ public final class PaymentPageApiSteps {
         return buildPaymentPageUrl(response.getGuid());
     }
 
-    /**
-     * Polls card-payments {@code POST /status} until {@code order.status} is {@code auth_ok}
-     * or the timeout elapses. Returns the latest response so the caller can assert.
-     */
     public OrderStatusResponse getOrderStatus(String orderId) {
-        long deadline = System.currentTimeMillis() + STATUS_TIMEOUT_MS;
-        OrderStatusResponse latest = null;
-        while (true) {
-            latest = orderStatusClient.getOrderStatus(orderId);
-            if (isExpectedStatus(latest) || System.currentTimeMillis() >= deadline) {
-                return latest;
-            }
-            sleepUntilNextPoll();
+        AtomicReference<OrderStatusResponse> latest = new AtomicReference<>();
+        try {
+            await()
+                    .atMost(Duration.ofSeconds(ApiParameters.getOrderStatusTimeoutSec()))
+                    .pollInterval(Duration.ofMillis(ApiParameters.getOrderStatusPollIntervalMs()))
+                    .until(() -> {
+                        OrderStatusResponse response = orderStatusClient.getOrderStatus(orderId);
+                        latest.set(response);
+                        return isExpectedStatus(response);
+                    });
+        } catch (ConditionTimeoutException exception) {
+            throw new IllegalStateException(
+                    "Timed out waiting for order status. orderId=%s, expected=%s, actual=%s"
+                            .formatted(orderId, TestData.EXPECTED_ORDER_STATUS, resolveStatus(latest.get())),
+                    exception);
         }
+        return latest.get();
     }
 
     private static boolean isExpectedStatus(OrderStatusResponse response) {
@@ -65,13 +69,12 @@ public final class PaymentPageApiSteps {
         return order != null && TestData.EXPECTED_ORDER_STATUS.equals(order.getStatus());
     }
 
-    private static void sleepUntilNextPoll() {
-        try {
-            Thread.sleep(STATUS_POLL_INTERVAL_MS);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while waiting for order status", exception);
+    private static String resolveStatus(OrderStatusResponse response) {
+        if (response == null || response.getOrder() == null) {
+            return "<no order>";
         }
+        var status = response.getOrder().getStatus();
+        return status != null ? status : "<null>";
     }
 
     public PaymentPageClient getClient() {

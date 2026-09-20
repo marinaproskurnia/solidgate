@@ -9,21 +9,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
+import static com.solidgate.config.ApiParameters.getWebDriverWaitTimeoutSec;
+
 public class PaymentSuccessPage {
 
     private static final By STATUS_TITLE = By.cssSelector("[data-testid='status-title']");
     private static final By STATUS_ORDER_DESCRIPTION = By.cssSelector("[data-testid='status-order-description']");
     private static final By STATUS_ORDER_TITLE = By.cssSelector("[data-testid='status-order-title']");
-    private static final By PRICE_LOCATORS = By.cssSelector(
-            "[data-testid='price_major'], [data-testid='price-major'], [data-testid='status-price']"
-    );
+    private static final By PRICE_LOCATORS = By.cssSelector("[data-testid='price_major']");
 
     private final WebDriver driver;
     private final WebDriverWait wait;
 
     public PaymentSuccessPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(getWebDriverWaitTimeoutSec()));
     }
 
     public PaymentSuccessPage waitForSuccess(String expectedTitle) {
@@ -52,7 +52,7 @@ public class PaymentSuccessPage {
             }
         }
         List<WebElement> nestedPrice = driver.findElements(
-                By.xpath("//*[@data-testid='price_major' or @data-testid='price-major']//*")
+                By.xpath("//*[@data-testid='price_major']//*")
         );
         for (WebElement pricePart : nestedPrice) {
             String text = pricePart.getText().trim();

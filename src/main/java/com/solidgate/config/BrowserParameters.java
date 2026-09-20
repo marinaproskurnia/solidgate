@@ -1,7 +1,6 @@
 package com.solidgate.config;
 
-import static com.solidgate.config.PropertyReader.PROPERTIES;
-import static java.lang.Boolean.parseBoolean;
+import static com.solidgate.config.PropertyReader.GLOBAL_PROPERTIES;
 
 public final class BrowserParameters {
 
@@ -10,6 +9,6 @@ public final class BrowserParameters {
     }
 
     public static boolean isBrowserHeadless() {
-        return parseBoolean(PROPERTIES.getProperty("browser.headless"));
+        return GLOBAL_PROPERTIES.getBoolean("browser.headless", false);
     }
 }

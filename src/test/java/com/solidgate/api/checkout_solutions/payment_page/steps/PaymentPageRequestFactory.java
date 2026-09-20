@@ -1,16 +1,17 @@
-package com.solidgate.api.checkout_solutions.payment_page;
+package com.solidgate.api.checkout_solutions.payment_page.steps;
 
+import com.solidgate.api.checkout_solutions.payment_page.data.TestData;
 import com.solidgate.model.request.InitPageRequest;
 import com.solidgate.model.request.Order;
 import com.solidgate.model.request.PageCustomization;
 
 import java.util.UUID;
 
-final class PaymentPageRequestFactory {
+public final class PaymentPageRequestFactory {
 
     private PaymentPageRequestFactory() {}
 
-    static InitPageRequest paymentRequest(String orderId) {
+    public static InitPageRequest paymentRequest(String orderId) {
         Order order = new Order();
         order.setOrderId(orderId);
         order.setAmount(TestData.PAYMENT_AMOUNT);
@@ -25,7 +26,7 @@ final class PaymentPageRequestFactory {
         return new InitPageRequest(order, pageCustomization);
     }
 
-    static InitPageRequest subscriptionRequest(String orderId, String productId) {
+    public static InitPageRequest subscriptionRequest(String orderId, String productId) {
         Order order = new Order();
         order.setOrderId(orderId);
         order.setProductId(productId);
@@ -36,7 +37,7 @@ final class PaymentPageRequestFactory {
         return new InitPageRequest(order, new PageCustomization(TestData.PUBLIC_NAME));
     }
 
-    static InitPageRequest invoiceRequest(String orderId, String invoiceId) {
+    public static InitPageRequest invoiceRequest(String orderId, String invoiceId) {
         Order order = new Order();
         order.setOrderId(orderId);
         order.setInvoiceId(invoiceId);

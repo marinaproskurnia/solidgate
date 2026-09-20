@@ -1,5 +1,6 @@
 package com.solidgate.api.checkout_solutions.payment_page;
 
+import com.solidgate.api.checkout_solutions.payment_page.steps.PaymentPageRequestFactory;
 import com.solidgate.client.PaymentPageClient;
 import com.solidgate.config.ApiParameters;
 import com.solidgate.model.request.InitPageRequest;
